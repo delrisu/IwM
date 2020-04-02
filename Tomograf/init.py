@@ -35,9 +35,9 @@ def display_sliders():
     display(checkbox_filtr)
     
 
-def save_dicom_data(): 
+def save_dicom_data(image): 
     save_dicom(text_name.value,text_image_comment.value,
-                                  text_study_date.value,cv2.imread(choose_file("Wybierz zdjecie do DICOM'a"),0),text_filename.value) 
+                                  text_study_date.value,image,text_filename.value) 
 
 def load_dicom_data():
     load_dicom(text_filename.value)
@@ -50,8 +50,20 @@ def make_reverse_sinogram(Sin):
 
 def sinograms():
     Sin = make_sinogram()
-    show_image()
     Gif = make_reverse_sinogram(Sin)
+    plt.subplots(figsize=(20, 10))
+    plt.subplot(1,3,1)
+    plt.axis('off')
+    plt.imshow(im_org, cmap='gray')
+    plt.title('Obraz oryginalny')
+    plt.subplot(1,3,2)
+    plt.axis('off')
+    plt.imshow(Sin, cmap='gray')
+    plt.title('Sinogram')
+    plt.subplot(1,3,3)
+    plt.axis('off')
+    plt.imshow(Gif[-1], cmap='gray')
+    plt.title('Efekt końcowy')
     return Gif
 
 def DICOMs():
@@ -59,9 +71,9 @@ def DICOMs():
     load_dicom_data()
     
     
-slider_l = widgets.IntSlider(min=90,max=270,step=10,value=180)
-slider_alpha = widgets.FloatSlider(min=0,max=4,step=0.01,value=0.5)
-slider_detectors = widgets.IntSlider(min=10,max=400,step=10,value=200)
+slider_l = widgets.IntSlider(min=45,max=270,step=45,value=180)
+slider_alpha = widgets.FloatSlider(min=0,max=4,step=0.1,value=2.0)
+slider_detectors = widgets.IntSlider(min=90,max=720,step=90,value=180)
 checkbox_filtr = widgets.Checkbox(
     value=False,
     description='Czy zastosowac filtr',
@@ -93,12 +105,17 @@ text_filename = widgets.Text(
     disabled=False
 )
 
+
+
 filename = choose_file("Wybierz zdjecie do sinogramu")
 
 print("Wybrano plik: ",filename)
 im_org = cv2.imread(filename, 0)
 
-im_org_res = cv2.resize(im_org, (500,500))
+def rmse(Y):
+    from sklearn.metrics import mean_squared_error
+    rmse = math.sqrt(mean_squared_error(im_org, Y))
+    return rmse
 
 R_org = min(im_org.shape)/2
 

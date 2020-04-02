@@ -96,32 +96,15 @@ def sinogram(ALPHA,DETECTORS,r, L, image, ifFiltr):
             sinogram[i][j] += misc
     if(ifFiltr):
         for k in range(sinogram.shape[0]):
-            sinogram[k]=np.convolve(sinogram[k],get_filtr(), mode='same')
-
-    
-    sinogram = (sinogram - np.amin(sinogram)) / (np.amax(sinogram) - np.amin(sinogram))
-    plt.imshow(sinogram, cmap='gray')
+            for i in range(5):
+                sinogram[k]=np.convolve(sinogram[k],get_filtr(), mode='same')
     return sinogram
     
-def masked_normal(x):
-    z = x * 1
-    minval = np.amin(x[np.nonzero(x)])
-    maxval = np.amax(x[np.nonzero(x)])
-    print(minval, maxval)
-
-    for i, k in enumerate(x):
-        for j, l in enumerate(k):
-            if l != 0:
-                z[i][j] = (l-minval)/(maxval-minval)
-            else:
-                z[i][j] = 0
-    return z
-
 def get_filtr():
     filtr = [1]
 
     for i in range(1,21):
-        if (i)%2:
+        if (i)%2 == 1:
             filtr.append(0)
         else:
             x=(-4/(math.pi)**2)/((i)**2)

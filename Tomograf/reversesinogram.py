@@ -1,11 +1,9 @@
-from timeit import default_timer as timer
-import matplotlib.pyplot as pltimer 
+import matplotlib.pyplot as plt 
 import numpy as np
 import cv2
 from sinogram import *
 def reverseSinogram(ALPHA,DETECTORS,r,R_org, L, sinogram,im):
     NUMBER_OF_EMITERS = int(360/ALPHA)
-    start = timer()
     gif = []
     x_range = range(int(R_org/2),im.shape[0]-int(R_org/2))
     y_range = range(int(R_org/2),im.shape[1]-int(R_org/2))
@@ -21,12 +19,10 @@ def reverseSinogram(ALPHA,DETECTORS,r,R_org, L, sinogram,im):
                     revSin[coord[0]-1][coord[1]-1] += sinogram[i][j]
                     counter[coord[0]-1][coord[1]-1]  += 1
         
-        if(i%90==0):
-            gif.append(revSin*1)
-            cv2.imwrite("gif"+str(i)+".png",revSin[int(R_org/2):-int(R_org/2),int(R_org/2):-int(R_org/2)])
+        if(i%10==0):
+            gif.append(revSin[int(R_org/2):-int(R_org/2),int(R_org/2):-int(R_org/2)]*1)
 
     gif.append(revSin[int(R_org/2):-int(R_org/2),int(R_org/2):-int(R_org/2)]*1)
-    cv2.imwrite("gif"+str(NUMBER_OF_EMITERS)+".png",revSin[int(R_org/2):-int(R_org/2),int(R_org/2):-int(R_org/2)])
     for x in range(revSin.shape[0]):
         if x in x_range:
             for y in range(revSin.shape[1]):
@@ -40,7 +36,5 @@ def reverseSinogram(ALPHA,DETECTORS,r,R_org, L, sinogram,im):
     #enhanced = cv2.equalizeHist(normalize.astype(np.uint8))
 
     gif.append(normalize)
-    cv2.imwrite("gif_FILTERED.png",normalize)
-    plt.imshow(normalize, cmap='gray')
-    print("time: ",timer()-start)
+    cv2.imwrite("FILTERED.png",normalize)
     return gif 
