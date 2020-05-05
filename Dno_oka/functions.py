@@ -158,7 +158,7 @@ def simple(image):
     image[image>=0.9] = 1
     image[image<0.1] = 0
     
-    plt.imshow(image)
+    return image
 
 
 def use_mask(image, mask):
