@@ -130,8 +130,8 @@ def predict(image):
 
 
 def mask(image):
-    image = image[:,:,1]
-    _,mask = cv2.threshold(image,10,255,cv2.THRESH_BINARY)
+    image = image[:,:,2]
+    _,mask = cv2.threshold(image,64,255,cv2.THRESH_BINARY)
     return mask
 
 def simple(image):
@@ -147,21 +147,19 @@ def simple(image):
     
     clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(3,3))
     image = clahe.apply(image)
-    image = frangi(image).astype('uint8')
-    image = cv2.adaptiveThreshold(image,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C,\
-                cv2.THRESH_BINARY,121,3)
-    image = cv2.dilate(image,kernel_dil,iterations = 1)
-    image = cv2.morphologyEx(image, cv2.MORPH_OPEN, kernel_open)
-    image = cv2.erode(image,kernel_ero,iterations = 1)
-    image = cv2.morphologyEx(image, cv2.MORPH_OPEN, kernel_open)
-
     
-
+    image = frangi(image)
+    image = cv2.normalize(image, None, 0, 255, cv2.NORM_MINMAX)
+    image = np.uint8(image)
+    image = cv2.erode(image,kernel_ero,iterations = 1)
+    
     image = image * maskO
     image = cv2.normalize(image, None, 0, 1, cv2.NORM_MINMAX)
     image[image>=0.9] = 1
     image[image<0.1] = 0
-    return image
+    
+    plt.imshow(image)
+
 
 def use_mask(image, mask):
     image = image*1
@@ -176,7 +174,7 @@ def use_mask(image, mask):
 
 def choose_file(window_title):
     root = Tk()
-    filename = askopenfilename(initialdir = "./data/",title = window_title,filetypes = (("bitmap files","*.ppm"),("jpeg files","*.jpg"),("all files","*.*")))
+    filename = askopenfilename(initialdir = "./data/",title = window_title,filetypes = (("all files","*.*"),("bitmap files","*.ppm"),("jpeg files","*.jpg")))
     root.destroy()
     return filename
     
