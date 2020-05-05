@@ -8,7 +8,6 @@ from tkinter.filedialog import askopenfilename
 from skimage.data import camera
 from skimage.filters import frangi, hessian
 from os import listdir
-from tqdm import tqdm 
 from skimage.transform import resize
 
 import cv2
@@ -131,7 +130,7 @@ def predict(image):
 
 
 def mask(image):
-    image = image[:,:,2]
+    image = image[:,:,1]
     _,mask = cv2.threshold(image,10,255,cv2.THRESH_BINARY)
     return mask
 
@@ -175,7 +174,7 @@ def use_mask(image, mask):
 
 def choose_file(window_title):
     root = Tk()
-    filename = askopenfilename(initialdir = "./data/",title = window_title,filetypes = (("jpeg files","*.jpg"),("all files","*.*")))
+    filename = askopenfilename(initialdir = "./data/",title = window_title,filetypes = (("bitmap files","*.ppm"),("jpeg files","*.jpg"),("all files","*.*")))
     root.destroy()
     return filename
     
@@ -188,16 +187,25 @@ def statistics(reference_mask, mask, algorithm_name):
         for idy,y in enumerate(x):
             if (reference_mask[idx][idy]==0 and mask[idx][idy]==0):
                 TN+=1
-            if (reference_mask[idx][idy]>0 and mask[idx][idy]>0):
+            elif (reference_mask[idx][idy]>0 and mask[idx][idy]>0):
                 TP+=1
-            if (reference_mask[idx][idy]==0 and mask[idx][idy]>0):
+            elif (reference_mask[idx][idy]==0 and mask[idx][idy]>0):
                 FP+=1
-            if (reference_mask[idx][idy]>0 and mask[idx][idy]==0):
+            elif (reference_mask[idx][idy]>0 and mask[idx][idy]==0):
                 FN+=1
+    acc_ = (TP+TN)/(TN+TP+FN+FP)
+    spe_ = TN/(FP+TN)
+    sen_ = TP/(FN+TP)
+    print(algorithm_name+" Bez stosowania proporcji\nTrafność: "+str(acc_*100)+"%\nCzułość: "+str(sen_*100)+"%\nSwoistość: "+str(spe_*100)+"%")
+    white_count = TP+FN
+    black_count = TN+FP
+    proportion = black_count/white_count
+    TP*=proportion
+    FP*=proportion
     acc = (TP+TN)/(TN+TP+FN+FP)
     spe = TN/(FP+TN)
     sen = TP/(FN+TP)
-    return algorithm_name+"\nTrafność: "+str(acc)+"%\nCzułość: "+str(sen)+"%\nSwoistość: "+str(spe)+"%"        
+    return algorithm_name+"\nTrafność: "+str(acc*100)+"%\nCzułość: "+str(sen*100)+"%\nSwoistość: "+str(spe*100)+"%"        
 
 def start():
     filename = choose_file("Wybierz zdjęcie dna oka")
