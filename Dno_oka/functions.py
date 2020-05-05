@@ -174,7 +174,7 @@ def use_mask(image, mask):
 
 def choose_file(window_title):
     root = Tk()
-    filename = askopenfilename(initialdir = "./data/",title = window_title,filetypes = (("bitmap files","*.ppm"),("jpeg files","*.jpg"),("all files","*.*")))
+    filename = askopenfilename(initialdir = "./data/",title = window_title,filetypes = (("all files","*.*"),("bitmap files","*.ppm"),("jpeg files","*.jpg")))
     root.destroy()
     return filename
     
