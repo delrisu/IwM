@@ -144,16 +144,18 @@ def simple(image):
     image = image[:,:,1]
     
     image = cv2.GaussianBlur(image,(3,3),0)
+    
     clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(3,3))
     image = clahe.apply(image)
-    image = cv2.adaptiveThreshold(image,255,cv2.THRESH_BINARY,\
+    image = frangi(image).astype('uint8')
+    image = cv2.adaptiveThreshold(image,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C,\
                 cv2.THRESH_BINARY,121,3)
     image = cv2.dilate(image,kernel_dil,iterations = 1)
     image = cv2.morphologyEx(image, cv2.MORPH_OPEN, kernel_open)
     image = cv2.erode(image,kernel_ero,iterations = 1)
     image = cv2.morphologyEx(image, cv2.MORPH_OPEN, kernel_open)
 
-    image = frangi(image)
+    
 
     image = image * maskO
     image = cv2.normalize(image, None, 0, 1, cv2.NORM_MINMAX)
@@ -174,7 +176,7 @@ def use_mask(image, mask):
 
 def choose_file(window_title):
     root = Tk()
-    filename = askopenfilename(initialdir = "./data/",title = window_title,filetypes = (("all files","*.*"),("bitmap files","*.ppm"),("jpeg files","*.jpg")))
+    filename = askopenfilename(initialdir = "./data/",title = window_title,filetypes = (("bitmap files","*.ppm"),("jpeg files","*.jpg"),("all files","*.*")))
     root.destroy()
     return filename
     
